@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>苏果超市</title>
+<link rel="stylesheet" href="/js/plugins/bootstrap/css/bootstrap.min.css">
+<script src="/js/plugins/jquery-2.2.4.min.js"></script>
+<script src="/js/plugins/bootstrap/js/bootstrap.min.js"></script>
+<style type="text/css">
+.error {
+	color: red;
+}
+</style>
+</head>
+<body>
+	<header
+		style="margin-bottom: 1em;; height: 8em; background: linear-gradient(to left, white, orange);">
+	</header>
+	<div class="container">
+		<div class="row">
+			<div class="span8">
+				<form class="form-horizontal" style="margin-top: 10em;">
+					<div class="control-group">
+						<label class="control-label" for="username">用户名</label>
+						<div class="controls">
+							<input id="username" required="required" type="text" /><span
+								id="usernameError" class="error"></span>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="password">密码</label>
+						<div class="controls">
+							<input id="password" type="password" /><span id="passwordError"
+								class="error"></span>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="controls">
+							<label class="checkbox"><input type="checkbox" id="remember"/>
+								Remember me</label>
+							<button type="button" id="btnLogin" class="btn">登陆</button>
+							<a class="btn" href="/register.html">注册</a>
+							<span class="error" id="loginError"></span>
+						</div>
+						
+					</div>
+				</form>
+			</div>
+			<div class="span4">
+				<div style="width: 20em; height: 20em; margin-top: 5em;">
+					<img src="/img/Nature/img1.jpg" style="width: 100%; height: 100%"
+						class="img-circle" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		$(function() {
+			bindLogin();
+			bindRemember();
+		});
+		function bindRemember(){
+			if(localStorage.getItem('saveUser')==='true'){
+				$('#username').val(localStorage.getItem('username'));
+				$('#password').val(localStorage.getItem('password'));
+				$('#remember').attr('checked',true);
+			}
+		}
+		function bindLogin() {
+			$('#btnLogin').click(function() {
+				var params = {
+					username : $('#username').val(),
+					password : $('#password').val()
+				};
+				$('.error').html('');
+				var validate = true;
+				if (validate) {
+					if (!params.username) {
+						$('#usernameError').text('用户名不能为空');
+						validate = false;
+					}
+					if (!params.password) {
+						$('#passwordError').text('密码不能为空');
+						validate = false;
+					}
+					if (validate === false) {
+						return;
+					}
+				}
+				$.ajax({
+					data : params,
+					type : 'post',
+					dataType : 'json',
+					url : '/sign/in',
+					success : function(json) {
+						if($('#remember').is(':checked')){
+							localStorage.setItem('username',params.username);
+							localStorage.setItem('password',params.password);
+							localStorage.setItem('saveUser','true');
+						}else{
+							localStorage.removeItem('username');
+							localStorage.removeItem('password');
+							localStorage.removeItem('saveUser');
+						}
+						if (json.success) {
+							alert('登录成功');
+						} else {
+							$('#loginError').html(json.msg);
+						}
+					}
+				});
+			});
+
+		}
+	</script>
+</body>
+</html>
